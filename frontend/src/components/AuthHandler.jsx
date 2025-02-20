@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GoogleLogin, googleLogout } from "@react-oauth/google";
 import axios from "axios";
 import FlashcardPage from "./FlashcardPage";
@@ -6,11 +6,22 @@ import FlashcardPage from "./FlashcardPage";
 const AuthHandler = () => {
   const [user, setUser] = useState(null);
 
+  // Check if user is already logged in
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+
+    // If user is found in local storage, set it to state
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   const handleLoginSuccess = async (credentialResponse) => {
     try {
       const res = await axios.post("http://127.0.0.1:5000/login", {
         token: credentialResponse.credential,
       });
+      localStorage.setItem('user', JSON.stringify(res.data)); // Store user in local storage
       setUser(res.data);
     } catch (error) {
       console.error("Login failed:", error);
@@ -19,6 +30,7 @@ const AuthHandler = () => {
 
   const handleLogout = () => {
     googleLogout();
+    localStorage.removeItem('user'); // Remove user from local storage
     setUser(null);
   };
 
