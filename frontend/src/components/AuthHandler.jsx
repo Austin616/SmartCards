@@ -10,7 +10,6 @@ const AuthHandler = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
 
-    // If user is found in local storage, set it to state
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -30,7 +29,7 @@ const AuthHandler = () => {
 
   const handleLogout = () => {
     googleLogout();
-    localStorage.removeItem('user'); // Remove user from local storage
+    localStorage.removeItem('user');
     setUser(null);
   };
 

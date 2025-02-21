@@ -10,10 +10,13 @@ routes_bp = Blueprint('routes', __name__)
 def create_flashcard():
     # Get the JSON data from the request body
     data = request.json
+    user_email = data.get('user_email')
+    
     flashcard = {
         'question': data['question'],
         'answer': data['answer'],
         'category': data.get('category', ''),
+        'user_email': user_email,
         'created_at': datetime.datetime.utcnow()
     }
     # Insert the flashcard into MongoDB
@@ -23,16 +26,15 @@ def create_flashcard():
 # Route to get all flashcards (GET request)
 @app.route('/api/flashcards', methods=['GET'])
 def get_flashcards():
-    flashcards = mongo.db.flashcards.find()
-    result = []
-    for card in flashcards:
-        result.append({
-            'id': str(card['_id']),  # Convert ObjectId to string
-            'question': card['question'],
-            'answer': card['answer'],
-            'category': card['category']
-        })
-    return jsonify(result)
+    user_email = request.args.get('user_email')
+    
+    if not user_email:
+        return jsonify({"error": "User email required"}), 400
+
+    # Fetch only flashcards that match the given user_email
+    flashcards = list(mongo.db.flashcards.find({"user_email": user_email}, {"_id": 0}))  
+    
+    return jsonify(flashcards)
 
 # Route to get a specific flashcard by ID (GET request)
 @app.route('/api/flashcards/<id>', methods=['GET'])
@@ -78,7 +80,7 @@ def delete_flashcard(id):
 @app.route('/api/flashcards', methods=['DELETE'])
 def delete_all_flashcards():
     try:
-        mongo.db.flashcards.delete_many({})  # Deletes all flashcards from the collection
-        return {"message": "All flashcards deleted successfully"}, 200
+        mongo.db.flashcards.delete_many({})
+        return jsonify({"message": "All flashcards deleted successfully!"})
     except Exception as e:
-        return {"message": f"Error deleting flashcards: {str(e)}"}, 500
+        return jsonify({"error": str(e)}), 500

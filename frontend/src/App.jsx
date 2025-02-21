@@ -1,6 +1,7 @@
 import React from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import AuthHandler from "./components/AuthHandler";
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 
 const App = () => {
   return (

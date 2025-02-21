@@ -8,16 +8,23 @@ const CreateFlashcardForm = ({ onAddFlashcard }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Prepare the flashcard data
-    const newFlashcard = { question, answer, category };
-
-    // Send a POST request to create a new flashcard
+    
+    const storedUser = JSON.parse(localStorage.getItem('user')); // Get user info
+    if (!storedUser || !storedUser.email) {
+      console.error('User email not found');
+      return;
+    }
+  
+    const newFlashcard = { 
+      question, 
+      answer, 
+      category, 
+      user_email: storedUser.email // Send user email to backend
+    };
+  
     axios.post('http://127.0.0.1:5000/api/flashcards', newFlashcard)
       .then((response) => {
-        // If the flashcard was created successfully, call the parent callback
         onAddFlashcard(newFlashcard);
-        // Reset the form fields
         setQuestion('');
         setAnswer('');
         setCategory('');
@@ -26,6 +33,7 @@ const CreateFlashcardForm = ({ onAddFlashcard }) => {
         console.error('Error creating flashcard:', error);
       });
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-4 bg-white rounded-lg shadow-md">
