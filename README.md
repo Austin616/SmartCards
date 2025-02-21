@@ -77,10 +77,6 @@ Flashcard AI is a full-stack application that converts PDFs or text files into i
    ```
 5. Open a pull request.
 
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
 ## Contact
 
-For any questions or support, reach out via email at your-email@example.com or open an issue on GitHub.
+For any questions or support, reach out via email at austintran616@gmail.com or open an issue on GitHub.
