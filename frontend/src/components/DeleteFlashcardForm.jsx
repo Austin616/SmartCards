@@ -1,16 +1,20 @@
 import React from "react";
 import axios from "axios";
 
-const DeleteFlashcardForm = ({ onDeleteFlashcard }) => {
+const DeleteFlashcardForm = ({ onDeleteFlashcard, user }) => {
   const handleDelete = () => {
-    axios
-      .delete("http://127.0.0.1:5000/api/flashcards")
-      .then(() => {
-        onDeleteFlashcard();  // This updates the state in the parent component
-      })
-      .catch((error) => {
-        console.error("Error deleting flashcards:", error);
-      });
+    if (user) {
+      axios
+        .delete(`http://127.0.0.1:5000/api/flashcards?user_email=${user.email}`)
+        .then(() => {
+          onDeleteFlashcard(); // This will update the state in the parent component to remove the deleted flashcards
+        })
+        .catch((error) => {
+          console.error("Error deleting flashcards:", error);
+        });
+    } else {
+      console.log("No user logged in!");
+    }
   };
 
   return (

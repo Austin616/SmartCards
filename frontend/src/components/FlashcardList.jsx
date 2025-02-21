@@ -35,7 +35,7 @@ const FlashcardList = ({ user }) => {
       <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Flashcards</h1>
       <CreateFlashcardForm onAddFlashcard={handleAddFlashcard} />
       <ul className="space-y-4 mt-6">
-        <DeleteFlashcardForm onDeleteFlashcard={handleDeleteFlashcard} />
+        <DeleteFlashcardForm onDeleteFlashcard={handleDeleteFlashcard} user={user} />
         {flashcards.length > 0 ? (
           flashcards.map((card) => (
             <li

@@ -67,20 +67,18 @@ def update_flashcard(id):
     else:
         return jsonify({"message": "Flashcard not found!"}), 404
 
-# Route to delete a flashcard (DELETE request)
-@app.route('/api/flashcards/<id>', methods=['DELETE'])
-def delete_flashcard(id):
-    result = mongo.db.flashcards.delete_one({'_id': ObjectId(id)})
-    if result.deleted_count > 0:
-        return jsonify({"message": "Flashcard deleted successfully!"})
-    else:
-        return jsonify({"message": "Flashcard not found!"}), 404
-    
-# Route to delete all flashcards (DELETE request)
+# Route to delete all flashcards for a user (DELETE request)
 @app.route('/api/flashcards', methods=['DELETE'])
 def delete_all_flashcards():
+    # Assuming user_email is passed as a query parameter
+    user_email = request.args.get('user_email')
+    
+    if not user_email:
+        return jsonify({"error": "User email required"}), 400
+
     try:
-        mongo.db.flashcards.delete_many({})
-        return jsonify({"message": "All flashcards deleted successfully!"})
+        # Delete only the flashcards that belong to the logged-in user
+        result = mongo.db.flashcards.delete_many({'user_email': user_email})
+        return jsonify({"message": f"{result.deleted_count} flashcards deleted successfully!"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
