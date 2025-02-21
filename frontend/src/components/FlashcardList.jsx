@@ -8,18 +8,21 @@ const FlashcardList = ({ user }) => {
 
   // Fetch flashcards for the logged-in user
   useEffect(() => {
-    if (user) {
+    // Make sure the user object is not empty and has the email
+    if (user && user.email) {
       axios
         .get(`http://127.0.0.1:5000/api/flashcards?user_email=${user.email}`)
         .then((response) => {
           setFlashcards(response.data);
         })
         .catch((error) => {
-          console.error("There was an error fetching the flashcards!", error);
+          console.error("Error fetching flashcards:", error);
         });
+    } else {
+      console.error("User email is not available.");
     }
   }, [user]);
-
+  
   // Add new flashcard to the state
   const handleAddFlashcard = (newFlashcard) => {
     setFlashcards([...flashcards, newFlashcard]);
