@@ -1,1 +1,49 @@
 @import 'tailwindcss';
+
+.flashcard-container {
+  perspective: 1000px;
+  width: 300px;
+  height: 200px;
+  cursor: pointer;
+}
+
+.flashcard {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+}
+
+.flipped {
+    transform: rotateY(180deg);
+}
+
+.front, .back {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border: 2px solid #3b82f6;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 20px;
+}
+
+.front {
+  background-color: #f9fafb;
+  color: #333;
+}
+
+.back {
+  background-color: #3b82f6;
+  color: white;
+  transform: rotateY(180deg);
+}

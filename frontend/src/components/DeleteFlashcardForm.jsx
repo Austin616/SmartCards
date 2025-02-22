@@ -3,22 +3,28 @@ import axios from "axios";
 
 const DeleteFlashcardForm = ({ onDeleteFlashcard, user }) => {
   const handleDelete = () => {
-    if (user) {
+    if (!user) {
+      console.log("No user logged in!");
+      return;
+    }
+
+    // Show confirmation popup
+    const confirmDelete = window.confirm("Are you sure you want to delete all flashcards? This action cannot be undone.");
+
+    if (confirmDelete) {
       axios
         .delete(`http://127.0.0.1:5000/api/flashcards?user_email=${user.email}`)
         .then(() => {
-          onDeleteFlashcard(); // This will update the state in the parent component to remove the deleted flashcards
+          onDeleteFlashcard(); // Update state to remove flashcards
         })
         .catch((error) => {
           console.error("Error deleting flashcards:", error);
         });
-    } else {
-      console.log("No user logged in!");
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto p-4 bg-white rounded-lg shadow-md">
+    <div className="max-w-lg mx-auto p-4 bg-white rounded-lg shadow-md border-2 border-red-400 mb-6">
       <h2 className="text-xl font-bold mb-4 text-center">Delete All Flashcards</h2>
       <button
         onClick={handleDelete}
