@@ -7,6 +7,8 @@ import Dashboard from "./components/dashboard";
 import Navbar from "./components/NavBar"; // Import Navbar
 import CreatePage from "./components/createPage"; 
 import SetDetailsPage from './components/SetDetailsPage';
+import ReviewSets from "./components/ReviewSets";
+import ReviewPage from "./components/ReviewPage";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -33,8 +35,10 @@ const App = () => {
           <Route path="/signin" element={<AuthHandler setUser={setUser} />} />
           <Route path="/dashboard" element={<Dashboard user={user} />} />
           <Route path="/create" element={<CreatePage user={user} />} />
-          <Route path="/review" element={<div>Review Sets</div>} />
+          <Route path="/review" element={<ReviewSets/>} />
           <Route path="/sets/:setId" element={<SetDetailsPage />} />
+          <Route path="/review/:setId" element={<ReviewPage />} />
+          <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </GoogleOAuthProvider>
     </Router>

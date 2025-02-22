@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import CreateFlashcardForm from "./CreateFlashcardForm";
-import DeleteFlashcardForm from "./DeleteFlashcardForm";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 const FlashcardList = ({ user, selectedSet }) => {
@@ -53,10 +52,7 @@ const FlashcardList = ({ user, selectedSet }) => {
         setId={selectedSet}
         onAddFlashcard={handleAddFlashcard}
       />
-      <DeleteFlashcardForm
-        onDeleteFlashcard={handleDeleteFlashcard}
-        user={user}
-      />
+
 
       {flashcards.length > 0 ? (
         <div className="flex flex-col items-center mt-6">

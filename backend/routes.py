@@ -24,8 +24,11 @@ def create_set():
 
 @app.route('/api/sets', methods=['GET'])
 def get_sets():
-    sets = list(mongo.db.sets.find({}, {"_id": 0}))
+    sets = list(mongo.db.sets.find({}, {"_id": 1, "name": 1}))  # Only fetch _id and name
+    for set_data in sets:
+        set_data["_id"] = str(set_data["_id"])  # Convert ObjectId to string
     return jsonify(sets)
+
 
 @app.route('/api/sets/<set_id>', methods=['GET'])
 def get_set_by_id(set_id):
