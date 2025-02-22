@@ -4,7 +4,7 @@ import FlashcardList from "./FlashcardList";
 const Dashboard = ({ user, onLogout }) => {
   return (
     <div>
-      <FlashcardList user={user} />
+      This is the fash card dashboard
     </div>
   );
 };

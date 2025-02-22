@@ -5,80 +5,93 @@ import datetime
 
 routes_bp = Blueprint('routes', __name__)
 
-# Route to create a flashcard (POST request)
+# -------------- Set Routes --------------
+@app.route('/api/sets', methods=['POST'])
+def create_set():
+    data = request.json
+    set_name = data.get('name')
+    
+    if not set_name:
+        return jsonify({"error": "Set name is required"}), 400
+
+    new_set = {
+        'name': set_name,
+        'created_at': datetime.datetime.utcnow()
+    }
+    
+    result = mongo.db.sets.insert_one(new_set)
+    return jsonify({"message": "Set created successfully!", "set_id": str(result.inserted_id)}), 201
+
+@app.route('/api/sets', methods=['GET'])
+def get_sets():
+    sets = list(mongo.db.sets.find({}, {"_id": 0}))
+    return jsonify(sets)
+
+@app.route('/api/sets/<set_id>', methods=['GET'])
+def get_set_by_id(set_id):
+    set = mongo.db.sets.find_one({"_id": ObjectId(set_id)}, {"_id": 0})
+    if set:
+        return jsonify(set)
+    else:
+        return jsonify({"error": "Set not found"}), 404
+
+@app.route('/api/sets/<set_id>', methods=['DELETE'])
+def delete_set(set_id):
+    try:
+        result = mongo.db.sets.delete_one({'_id': ObjectId(set_id)})
+        
+        if result.deleted_count == 1:
+            mongo.db.flashcards.delete_many({'set_id': set_id})
+            return jsonify({"message": "Set and associated flashcards deleted successfully!"}), 200
+        else:
+            return jsonify({"error": "Set not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# -------------- Flashcard Routes --------------
 @app.route('/api/flashcards', methods=['POST'])
 def create_flashcard():
-    # Get the JSON data from the request body
     data = request.json
     user_email = data.get('user_email')
+    set_id = data.get('set_id')
+    
+    if not user_email or not set_id:
+        return jsonify({"error": "User email and set ID are required"}), 400
     
     flashcard = {
         'question': data['question'],
         'answer': data['answer'],
         'category': data.get('category', ''),
         'user_email': user_email,
+        'set_id': set_id,
         'created_at': datetime.datetime.utcnow()
     }
-    # Insert the flashcard into MongoDB
+    
     mongo.db.flashcards.insert_one(flashcard)
     return jsonify({"message": "Flashcard created successfully!"}), 201
 
-# Route to get all flashcards (GET request)
-@app.route('/api/flashcards', methods=['GET'])
-def get_flashcards():
-    user_email = request.args.get('user_email')
-    
-    if not user_email:
-        return jsonify({"error": "User email required"}), 400
-
-    # Fetch only flashcards that match the given user_email
-    flashcards = list(mongo.db.flashcards.find({"user_email": user_email}, {"_id": 0}))  
-    
+@app.route('/api/sets/<set_id>/flashcards', methods=['GET'])
+def get_flashcards_by_set(set_id):
+    flashcards = list(mongo.db.flashcards.find({"set_id": set_id}, {"_id": 0}))
     return jsonify(flashcards)
 
-# Route to get a specific flashcard by ID (GET request)
-@app.route('/api/flashcards/<id>', methods=['GET'])
-def get_flashcard(id):
-    flashcard = mongo.db.flashcards.find_one({'_id': ObjectId(id)})
-    if flashcard:
-        return jsonify({
-            'question': flashcard['question'],
-            'answer': flashcard['answer'],
-            'category': flashcard['category']
-        })
-    else:
-        return jsonify({"message": "Flashcard not found!"}), 404
-
-# Route to update a flashcard (PUT request)
-@app.route('/api/flashcards/<id>', methods=['PUT'])
-def update_flashcard(id):
-    data = request.json
-    updated_flashcard = {
-        'question': data['question'],
-        'answer': data['answer'],
-        'category': data.get('category', '')
-    }
-    result = mongo.db.flashcards.update_one(
-        {'_id': ObjectId(id)},
-        {'$set': updated_flashcard}
-    )
-    if result.matched_count > 0:
-        return jsonify({"message": "Flashcard updated successfully!"})
-    else:
-        return jsonify({"message": "Flashcard not found!"}), 404
-
-# Route to delete all flashcards for a user (DELETE request)
 @app.route('/api/flashcards', methods=['DELETE'])
 def delete_all_flashcards():
-    # Assuming user_email is passed as a query parameter
     user_email = request.args.get('user_email')
     
     if not user_email:
         return jsonify({"error": "User email required"}), 400
 
     try:
-        # Delete only the flashcards that belong to the logged-in user
         result = mongo.db.flashcards.delete_many({'user_email': user_email})
+        return jsonify({"message": f"{result.deleted_count} flashcards deleted successfully!"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/sets/<set_id>/flashcards', methods=['DELETE'])
+def delete_flashcards_by_set(set_id):
+    try:
+        result = mongo.db.flashcards.delete_many({'set_id': set_id})
         return jsonify({"message": f"{result.deleted_count} flashcards deleted successfully!"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

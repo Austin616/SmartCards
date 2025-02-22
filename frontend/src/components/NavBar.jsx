@@ -49,10 +49,10 @@ const Navbar = ({ user, onLogout }) => {
 
       <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexGrow: 1 }}>
         <Link to="/create" style={{ padding: '10px', backgroundColor: '#4CAF50', color: 'white', borderRadius: '5px' }}>
-          Create Flashcard
+          Create Sets
         </Link>
         <Link to="/review" style={{ padding: '10px', backgroundColor: '#2196F3', color: 'white', borderRadius: '5px' }}>
-          Review Flashcards
+          Review Sets
         </Link>
       </div>
 
