@@ -70,13 +70,25 @@ def create_flashcard():
         'created_at': datetime.datetime.utcnow()
     }
     
-    mongo.db.flashcards.insert_one(flashcard)
-    return jsonify({"message": "Flashcard created successfully!"}), 201
+    # Insert the flashcard and get the inserted ID
+    result = mongo.db.flashcards.insert_one(flashcard)
+    
+    # Add the _id to the flashcard response
+    flashcard['_id'] = str(result.inserted_id)
+    
+    return jsonify(flashcard), 201
+
 
 @app.route('/api/sets/<set_id>/flashcards', methods=['GET'])
 def get_flashcards_by_set(set_id):
-    flashcards = list(mongo.db.flashcards.find({"set_id": set_id}, {"_id": 0}))
+    flashcards = list(mongo.db.flashcards.find({"set_id": set_id}))
+    
+    # Ensure the _id is returned as a string
+    for flashcard in flashcards:
+        flashcard["_id"] = str(flashcard["_id"])  # Convert ObjectId to string
+    
     return jsonify(flashcards)
+
 
 @app.route('/api/flashcards', methods=['DELETE'])
 def delete_all_flashcards():
@@ -96,5 +108,16 @@ def delete_flashcards_by_set(set_id):
     try:
         result = mongo.db.flashcards.delete_many({'set_id': set_id})
         return jsonify({"message": f"{result.deleted_count} flashcards deleted successfully!"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/flashcards/<flashcard_id>', methods=['DELETE'])
+def delete_flashcard(flashcard_id):
+    try:
+        result = mongo.db.flashcards.delete_one({'_id': ObjectId(flashcard_id)})
+        if result.deleted_count == 1:
+            return jsonify({"message": "Flashcard deleted successfully!"}), 200
+        else:
+            return jsonify({"error": "Flashcard not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500

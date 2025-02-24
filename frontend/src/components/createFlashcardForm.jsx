@@ -5,17 +5,16 @@ const CreateFlashcardForm = ({ setId, onAddFlashcard }) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [category, setCategory] = useState("");
-  const [successMessage, setSuccessMessage] = useState(""); // State for success message
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     const storedUser = JSON.parse(localStorage.getItem("user")); // Get user info
     if (!storedUser || !storedUser.email) {
       console.error("User email not found");
       return;
     }
-
+  
     const newFlashcard = {
       question,
       answer,
@@ -23,20 +22,22 @@ const CreateFlashcardForm = ({ setId, onAddFlashcard }) => {
       user_email: storedUser.email,
       set_id: setId, // Pass selected set_id here
     };
-
+  
     axios
       .post("http://127.0.0.1:5000/api/flashcards", newFlashcard)
       .then((response) => {
-        onAddFlashcard(newFlashcard); // Callback to update parent component
+        // Ensure that the response contains the flashcard with its _id
+        const createdFlashcard = response.data; // Assuming the response contains the flashcard object with _id
+        onAddFlashcard(createdFlashcard); // Callback to update parent component with the full flashcard object
         setQuestion("");
         setAnswer("");
         setCategory("");
-        setSuccessMessage("Flashcard created successfully!");
       })
       .catch((error) => {
         console.error("Error creating flashcard:", error);
       });
   };
+  
 
   return (
     <div className="max-w-lg mx-auto mb-8">
@@ -82,12 +83,6 @@ const CreateFlashcardForm = ({ setId, onAddFlashcard }) => {
         </button>
       </form>
 
-      {/* Success Message */}
-      {successMessage && (
-        <p className="text-center text-green-600 font-semibold bg-green-100 p-2 rounded-lg mt-4">
-          {successMessage}
-        </p>
-      )}
     </div>
   );
 };
