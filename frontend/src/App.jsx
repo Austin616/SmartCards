@@ -5,10 +5,10 @@ import HomePage from "./components/homePage";
 import AuthHandler from "./components/AuthHandler";
 import Dashboard from "./components/dashboard";
 import Navbar from "./components/NavBar"; // Import Navbar
-import CreatePage from "./components/createPage"; 
-import SetDetailsPage from './components/SetDetailsPage';
-import ReviewSets from "./components/ReviewSets";
-import ReviewPage from "./components/ReviewPage";
+import CreatePage from "./components/sets/createPage"; 
+import ReviewSets from "./components/review/ReviewSets";
+import SetDetailsPage from "./components/sets/SetDetailsPage";
+import ReviewPage from "./components/review/ReviewPage";
 
 const App = () => {
   const [user, setUser] = useState(null);

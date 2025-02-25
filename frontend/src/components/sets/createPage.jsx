@@ -7,31 +7,29 @@ const CreatePage = () => {
   const [sets, setSets] = useState([]);
 
   useEffect(() => {
-    // Check if sets are stored in localStorage
-    const storedSets = localStorage.getItem("sets");
-    if (storedSets) {
-      const validSets = JSON.parse(storedSets).filter(set => set._id && set._id !== "undefined");
-      setSets(validSets);
-      localStorage.setItem("sets", JSON.stringify(validSets)); // Store valid sets in localStorage
-    } else {
-      fetch("http://127.0.0.1:5000/api/sets")
-        .then((response) => response.json())
-        .then((data) => {
-          const validSets = data.filter(set => set._id && set._id !== "undefined");
-          setSets(validSets);
-          localStorage.setItem("sets", JSON.stringify(validSets)); // Store valid sets in localStorage
-        })
-        .catch((error) => {
-          console.error("Error fetching sets:", error);
-        });
-    }
+    // Fetch sets directly from the backend to avoid stale data from localStorage
+    fetch("http://127.0.0.1:5000/api/sets")
+      .then((response) => response.json())
+      .then((data) => {
+        // Filter out invalid sets (sets without _id or with undefined _id)
+        const validSets = data.filter(set => set._id && set._id !== "undefined");
+        setSets(validSets);
+        localStorage.setItem("sets", JSON.stringify(validSets)); // Store valid sets in localStorage
+      })
+      .catch((error) => {
+        console.error("Error fetching sets:", error);
+      });
   }, []);
-  
+
   // Function to handle adding a new set
   const handleAddSet = (newSet) => {
-    const updatedSets = [...sets, newSet];
-    setSets(updatedSets);
-    localStorage.setItem("sets", JSON.stringify(updatedSets)); // Persist new set in localStorage
+    if (newSet._id) {
+      const updatedSets = [...sets, newSet];
+      setSets(updatedSets);
+      localStorage.setItem("sets", JSON.stringify(updatedSets)); // Persist new set in localStorage
+    } else {
+      console.error("Attempted to add set without valid _id", newSet);
+    }
   };
 
   // Function to handle deleting a set
@@ -40,10 +38,17 @@ const CreatePage = () => {
     axios
       .delete(`http://127.0.0.1:5000/api/sets/${setId}`)
       .then(() => {
-        // Remove the set from state and localStorage
-        const updatedSets = sets.filter(set => set._id !== setId);
-        setSets(updatedSets);
-        localStorage.setItem("sets", JSON.stringify(updatedSets)); // Persist changes in localStorage
+        // After deletion, fetch the updated set list from the backend
+        fetch("http://127.0.0.1:5000/api/sets")
+          .then((response) => response.json())
+          .then((data) => {
+            const validSets = data.filter(set => set._id && set._id !== "undefined");
+            setSets(validSets);
+            localStorage.setItem("sets", JSON.stringify(validSets)); // Update localStorage
+          })
+          .catch((error) => {
+            console.error("Error fetching updated sets:", error);
+          });
       })
       .catch((error) => {
         console.error("Error deleting set:", error);

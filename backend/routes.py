@@ -121,3 +121,12 @@ def delete_flashcard(flashcard_id):
             return jsonify({"error": "Flashcard not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/test_db_connection')
+def test_db_connection():
+    try:
+        # Try to fetch a document from a collection to verify the connection
+        mongo.db.sets.find_one()
+        return "Connection successful!"
+    except Exception as e:
+        return f"Error: {str(e)}"

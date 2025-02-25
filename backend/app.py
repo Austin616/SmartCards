@@ -8,7 +8,8 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
 # Set up MongoDB URI for local MongoDB or use MongoDB Atlas connection string
-app.config["MONGO_URI"] = "mongodb://localhost:27017/flashcard_db"
+app.config["MONGO_URI"] = "mongodb+srv://austintran616:HMw5ST6kB91brIKN@cluster0.cc5kh.mongodb.net/flashcard_db?retryWrites=true&w=majority&appName=Cluster0"
+
 mongo = PyMongo(app)
 
 from routes import *

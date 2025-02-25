@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import CreateFlashcardForm from './CreateFlashcardForm';
+import CreateFlashcardForm from '../flashcards/createFlashcardForm';
 
 const SetDetailsPage = () => {
   const { setId } = useParams();

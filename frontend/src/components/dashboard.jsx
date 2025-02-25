@@ -1,5 +1,4 @@
 import React from 'react'
-import FlashcardList from "./FlashcardList";
 
 const Dashboard = ({ user, onLogout }) => {
   return (

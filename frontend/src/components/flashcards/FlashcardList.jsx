@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import CreateFlashcardForm from "./CreateFlashcardForm";
+import CreateFlashcardForm from "./createFlashcardForm";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 const FlashcardList = ({ user, selectedSet }) => {
