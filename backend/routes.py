@@ -18,7 +18,7 @@ def create_set():
     new_set = {
         'name': set_name,
         'user_email': user_email,  # Associate set with a specific user
-        'created_at': datetime.datetime.utcnow()
+        'created_at': datetime.datetime.now()
     }
     
     result = mongo.db.sets.insert_one(new_set)
@@ -102,7 +102,7 @@ def create_flashcard():
         'category': data.get('category', ''),
         'user_email': user_email,
         'set_id': set_id,
-        'created_at': datetime.datetime.utcnow()
+        'created_at': datetime.datetime.now()
     }
     
     # Insert the flashcard and get the inserted ID

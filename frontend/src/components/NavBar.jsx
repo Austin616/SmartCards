@@ -48,11 +48,17 @@ const Navbar = ({ user, onLogout }) => {
       </div>
 
       <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexGrow: 1 }}>
+        <Link to="/" style={{ padding: '10px', backgroundColor: '#f44336', color: 'white', borderRadius: '5px' }}>
+          Dashboard
+        </Link>
         <Link to="/create" style={{ padding: '10px', backgroundColor: '#4CAF50', color: 'white', borderRadius: '5px' }}>
           Create Sets
         </Link>
         <Link to="/review" style={{ padding: '10px', backgroundColor: '#2196F3', color: 'white', borderRadius: '5px' }}>
           Review Sets
+        </Link>
+        <Link to="/ai-sets" style={{ padding: '10px', backgroundColor: '#FFC107', color: 'white', borderRadius: '5px' }}>
+          AI Sets
         </Link>
       </div>
 

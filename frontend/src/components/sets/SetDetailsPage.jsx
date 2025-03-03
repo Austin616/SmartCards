@@ -44,7 +44,7 @@ const SetDetailsPage = () => {
   return (
     <div className="max-w-xl mx-auto p-4 flex flex-col items-center">
       <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">
-        Create Flashcards for Set: {setName || "Loading..."}
+        {setName}
       </h1>
 
       <CreateFlashcardForm setId={setId} onAddFlashcard={handleFlashcardCreation} />
