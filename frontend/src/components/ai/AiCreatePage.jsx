@@ -17,11 +17,15 @@ const AiCreatePage = () => {
       setSelectedFile(file);
       setFileType(file.type);
 
+      // Handle text file
       if (file.type === "text/plain") {
         const reader = new FileReader();
         reader.onload = (e) => setFilePreview(e.target.result); // Store text content as preview
         reader.readAsText(file);
-      } else if (file.type === "application/pdf") {
+      } 
+      
+      // Handle PDF file (show a preview or file link)
+      else if (file.type === "application/pdf") {
         setFilePreview(URL.createObjectURL(file)); // For PDF, show as object URL
       }
     }
@@ -68,8 +72,8 @@ const AiCreatePage = () => {
   const handleAskQuestion = async (event) => {
     if (event.key === "Enter") {
       setLoading(true);
-      setChatMessages([
-        ...chatMessages,
+      setChatMessages([ 
+        ...chatMessages, 
         { type: "user", message: question, timestamp: new Date().toLocaleTimeString() },
       ]);
 
@@ -85,7 +89,7 @@ const AiCreatePage = () => {
         setQuestion(""); // Clear the question input after submitting
       } catch (error) {
         console.error("Error answering question:", error);
-        setChatMessages([
+        setChatMessages([ 
           ...chatMessages,
           { type: "ai", message: "Error answering question.", timestamp: new Date().toLocaleTimeString() },
         ]);
@@ -138,6 +142,20 @@ const AiCreatePage = () => {
         <div className="bg-gray-100 p-4 rounded-lg mb-6">
           <h2 className="text-lg font-semibold text-gray-700">File Preview:</h2>
           <pre className="text-sm text-gray-800 whitespace-pre-wrap break-words">{filePreview}</pre>
+        </div>
+      )}
+
+      {/* Display PDF file preview as an embedded object or a link */}
+      {fileType === "application/pdf" && filePreview && (
+        <div className="bg-gray-100 p-4 rounded-lg mb-6">
+          <h2 className="text-lg font-semibold text-gray-700">File Preview:</h2>
+          <embed
+            src={filePreview}
+            width="100%"
+            height="500px"
+            type="application/pdf"
+            alt="PDF Preview"
+          />
         </div>
       )}
 
