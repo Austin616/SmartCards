@@ -10,24 +10,54 @@ routes_bp = Blueprint('routes', __name__)
 def create_set():
     data = request.json
     set_name = data.get('name')
-    
-    if not set_name:
-        return jsonify({"error": "Set name is required"}), 400
+    user_email = data.get('user_email')
+
+    if not set_name or not user_email:
+        return jsonify({"error": "Set name and user email are required"}), 400
 
     new_set = {
         'name': set_name,
+        'user_email': user_email,  # Associate set with a specific user
         'created_at': datetime.datetime.utcnow()
     }
     
     result = mongo.db.sets.insert_one(new_set)
     return jsonify({"message": "Set created successfully!", "set_id": str(result.inserted_id)}), 201
 
+
 @app.route('/api/sets', methods=['GET'])
 def get_sets():
-    sets = list(mongo.db.sets.find({}, {"_id": 1, "name": 1}))  # Only fetch _id and name
+    user_email = request.args.get('user_email')
+    
+    if not user_email:
+        return jsonify({"error": "User email is required"}), 400
+
+    sets = list(mongo.db.sets.find({"user_email": user_email}, {"_id": 1, "name": 1}))
     for set_data in sets:
         set_data["_id"] = str(set_data["_id"])  # Convert ObjectId to string
+
     return jsonify(sets)
+
+@app.route('/api/sets/<set_id>', methods=['PUT'])
+def update_set(set_id):
+    data = request.json
+    set_name = data.get('name')
+    
+    if not set_name:
+        return jsonify({"error": "Set name is required"}), 400
+
+    try:
+        result = mongo.db.sets.update_one(
+            {'_id': ObjectId(set_id)},
+            {'$set': {'name': set_name}}
+        )
+        
+        if result.modified_count == 1:
+            return jsonify({"message": "Set updated successfully!"}), 200
+        else:
+            return jsonify({"error": "Set not found or no changes made"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/api/sets/<set_id>', methods=['GET'])
@@ -40,16 +70,21 @@ def get_set_by_id(set_id):
 
 @app.route('/api/sets/<set_id>', methods=['DELETE'])
 def delete_set(set_id):
-    try:
-        result = mongo.db.sets.delete_one({'_id': ObjectId(set_id)})
-        
-        if result.deleted_count == 1:
-            mongo.db.flashcards.delete_many({'set_id': set_id})
-            return jsonify({"message": "Set and associated flashcards deleted successfully!"}), 200
-        else:
-            return jsonify({"error": "Set not found"}), 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    user_email = request.args.get('user_email')
+
+    if not user_email:
+        return jsonify({"error": "User email is required"}), 400
+
+    set_to_delete = mongo.db.sets.find_one({'_id': ObjectId(set_id), 'user_email': user_email})
+
+    if not set_to_delete:
+        return jsonify({"error": "Set not found or you do not have permission to delete it"}), 404
+
+    mongo.db.sets.delete_one({'_id': ObjectId(set_id)})
+    mongo.db.flashcards.delete_many({'set_id': set_id})  # Delete associated flashcards
+
+    return jsonify({"message": "Set and associated flashcards deleted successfully!"}), 200
+
 
 # -------------- Flashcard Routes --------------
 @app.route('/api/flashcards', methods=['POST'])

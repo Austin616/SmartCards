@@ -6,9 +6,14 @@ const CreateSetForm = ({ onAddSet }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        const newSet = { name: setName };
-
+        const user = JSON.parse(localStorage.getItem('user')); // Retrieve user info
+        if (!user || !user.email) {
+            console.error("User email not found!");
+            return;
+        }
+    
+        const newSet = { name: setName, user_email: user.email };
+    
         axios
             .post('http://127.0.0.1:5000/api/sets', newSet)
             .then((response) => {
@@ -19,6 +24,7 @@ const CreateSetForm = ({ onAddSet }) => {
                 console.error("Error creating set:", error);
             });
     };
+    
 
     return (
         <div className="max-w-lg mx-auto mb-8">

@@ -7,19 +7,20 @@ const CreatePage = () => {
   const [sets, setSets] = useState([]);
 
   useEffect(() => {
-    // Fetch sets directly from the backend to avoid stale data from localStorage
-    fetch("http://127.0.0.1:5000/api/sets")
-      .then((response) => response.json())
-      .then((data) => {
-        // Filter out invalid sets (sets without _id or with undefined _id)
-        const validSets = data.filter(set => set._id && set._id !== "undefined");
-        setSets(validSets);
-        localStorage.setItem("sets", JSON.stringify(validSets)); // Store valid sets in localStorage
-      })
-      .catch((error) => {
-        console.error("Error fetching sets:", error);
-      });
-  }, []);
+    const user = JSON.parse(localStorage.getItem('user')); // Get user from localStorage
+    if (!user || !user.email) return;
+
+    axios.get(`http://127.0.0.1:5000/api/sets?user_email=${user.email}`)
+        .then((response) => {
+            const validSets = response.data.filter(set => set._id && set._id !== "undefined");
+            setSets(validSets);
+            localStorage.setItem("sets", JSON.stringify(validSets));
+        })
+        .catch((error) => {
+            console.error("Error fetching sets:", error);
+        });
+}, []);
+
 
   // Function to handle adding a new set
   const handleAddSet = (newSet) => {
@@ -34,26 +35,24 @@ const CreatePage = () => {
 
   // Function to handle deleting a set
   const handleDeleteSet = (setId) => {
-    // Make DELETE request to backend
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.email) return;
+
     axios
-      .delete(`http://127.0.0.1:5000/api/sets/${setId}`)
-      .then(() => {
-        // After deletion, fetch the updated set list from the backend
-        fetch("http://127.0.0.1:5000/api/sets")
-          .then((response) => response.json())
-          .then((data) => {
-            const validSets = data.filter(set => set._id && set._id !== "undefined");
+        .delete(`http://127.0.0.1:5000/api/sets/${setId}?user_email=${user.email}`)
+        .then(() => {
+            return axios.get(`http://127.0.0.1:5000/api/sets?user_email=${user.email}`);
+        })
+        .then((response) => {
+            const validSets = response.data.filter(set => set._id && set._id !== "undefined");
             setSets(validSets);
-            localStorage.setItem("sets", JSON.stringify(validSets)); // Update localStorage
-          })
-          .catch((error) => {
-            console.error("Error fetching updated sets:", error);
-          });
-      })
-      .catch((error) => {
-        console.error("Error deleting set:", error);
-      });
-  };
+            localStorage.setItem("sets", JSON.stringify(validSets));
+        })
+        .catch((error) => {
+            console.error("Error deleting set:", error);
+        });
+};
+
 
   return (
     <div className="max-w-3xl mx-auto p-4">

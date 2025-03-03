@@ -5,7 +5,13 @@ const ReviewSets = () => {
     const [sets, setSets] = useState([]);
   
     useEffect(() => {
-      fetch("http://127.0.0.1:5000/api/sets")
+      const user = JSON.parse(localStorage.getItem('user')); // Get user from localStorage
+      if (!user || !user.email){
+        console.error("User email not found!");
+        return;
+      }
+      // Fetch sets from the backend
+      fetch("http://127.0.0.1:5000/api/sets?user_email=" + user.email)
         .then((response) => response.json())
         .then((data) => {
           // Filter out sets that have undefined IDs or empty names
