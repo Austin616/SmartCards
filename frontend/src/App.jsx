@@ -9,6 +9,7 @@ import ReviewSets from "./components/review/ReviewSets";
 import SetDetailsPage from "./components/sets/SetDetailsPage";
 import ReviewPage from "./components/review/ReviewPage";
 import AiCreatePage from "./components/ai/AiCreatePage";
+import ApiTestComponent from "./components/ai/ApiTestComponent";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -39,6 +40,7 @@ const App = () => {
           <Route path="/sets/:setId" element={<SetDetailsPage />} />
           <Route path="/review/:setId" element={<ReviewPage />} />
           <Route path="/ai-sets" element={<AiCreatePage/>} />
+          <Route path="/test" element={<ApiTestComponent/>}/>
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </GoogleOAuthProvider>
