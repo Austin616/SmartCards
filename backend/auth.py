@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify
 import google.auth.transport.requests
 import google.oauth2.id_token
+from app import GOOGLE_CLIENT_ID
+
 
 auth_bp = Blueprint('auth', __name__) # Create a blueprint for authentication
-
-GOOGLE_CLIENT_ID = '151727235395-ci6pbkgf8tuhkgttuk9e6bo1mkn9u20b.apps.googleusercontent.com' 
 
 @auth_bp.route('/login', methods=['POST'])
 def google_login():

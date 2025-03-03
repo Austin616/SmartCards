@@ -12,6 +12,7 @@ import AiCreatePage from "./components/ai/AiCreatePage";
 
 const App = () => {
   const [user, setUser] = useState(null);
+  const googleClientId = import.meta.env.VITE_GOOGLE_AUTH;
 
   // Check if user is already logged in
   useEffect(() => {
@@ -28,7 +29,7 @@ const App = () => {
 
   return (
     <Router>
-      <GoogleOAuthProvider clientId="151727235395-ci6pbkgf8tuhkgttuk9e6bo1mkn9u20b.apps.googleusercontent.com">
+      <GoogleOAuthProvider clientId={googleClientId}>
         <Navbar user={user} onLogout={handleLogout} />
         <Routes>
           <Route path="/signin" element={<AuthHandler setUser={setUser} />} />

@@ -1,9 +1,73 @@
 from flask import request, jsonify, Blueprint
-from app import app, mongo
+from app import app, mongo, OPEN_AI
 from bson import ObjectId
 import datetime
+import openai
+import os
+from dotenv import load_dotenv
+
 
 routes_bp = Blueprint('routes', __name__)
+
+openai.api_key = OPEN_AI
+
+@app.route('/')
+def index():
+    return "Welcome to the Flashcard API!"
+
+
+# -------------- AI Routes --------------- 
+@app.route('/api/test', methods=['GET'])
+def test():
+    try:
+        # Use the updated OpenAI API (chat completion instead of text completion)
+        response = openai.chat.completions.create(model="gpt-4", messages=[{"role": "user", "content": "Hello, world!"}])
+        return jsonify({"message": "Test successful!", "response": response}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/summarize', methods=['POST'])
+def summarize():
+    data = request.json
+    text = data.get('text')
+    
+    if not text:
+        return jsonify({"error": "Text is required"}), 400
+    
+    try:
+        response = openai.chat.completions.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": f"Summarize the following text: {text}"}]
+        )
+        summary = response.choices[0].message.content.strip()
+        return jsonify({"summary": summary}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+@app.route('/api/ask', methods=['POST'])
+def ask_question():
+    data = request.json
+    question = data.get('question')
+    context = data.get('context')  # This can be the summary or the full text
+
+    if not question or not context:
+        return jsonify({"error": "Question and context are required"}), 400
+
+    try:
+        response = openai.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a friendly and empathetic assistant, always responding with kindness and positivity."},
+                {"role": "user", "content": f"Can you help me with the following question based on this context? {context}\n\nQuestion: {question}"}
+            ]
+        )
+        answer = response.choices[0].message.content.strip()
+        return jsonify({"answer": answer}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 # -------------- Set Routes --------------
 @app.route('/api/sets', methods=['POST'])
